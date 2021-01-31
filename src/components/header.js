@@ -3,6 +3,8 @@ import { AppBar, Badge, Button, ClickAwayListener,  IconButton, makeStyles, Popo
 import MenuIcon from '@material-ui/icons/Menu'
 import { MENU_BAR, MENU_ICON } from '../constants/menu-bar';
 import { LinkContainer } from 'react-router-bootstrap'
+import { ShoppingCart } from '@material-ui/icons';
+import { useSelector } from 'react-redux';
 
 
 const styles = makeStyles((theme)=>({
@@ -43,6 +45,7 @@ const Header = () => {
     const [selectedMenu, setSelectedMenu] = useState(MENU_BAR[0])
     const [anchorEle, setAnchorEle] = useState(null)
     const [menuID, setMenuID] = useState(null)
+    const { total } = useSelector(state=>state.menu)
     
     const handleMenuMobile = (event = null) => {
         if (event === null){
@@ -87,6 +90,11 @@ const Header = () => {
     const menu_mobile = () => (
         <ClickAwayListener onClickAway={()=>handleMenuMobile()}>
             <div className={classes.sectionMobile}>
+                <IconButton color='inherit' aria-describedby={menuID} onClick={event=>handleMenuMobile(event)}>
+                    <Badge badgeContent={total ? total : 0} showZero color='secondary' >
+                        <ShoppingCart/>
+                    </Badge>
+                </IconButton>
                 <IconButton color='inherit' aria-describedby={menuID} onClick={event=>handleMenuMobile(event)}>
                     <MenuIcon/>
                 </IconButton>
