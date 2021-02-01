@@ -6,17 +6,17 @@ export const getCategory = () => ({
     payload: menuApi.getCategory()
 })
 
-export const getMenu = (cat) => ({
+export const getMenu = (menu, cat) => ({
     type: ACTIONS.GET_MENU,
-    payload: menuApi.getMenu(cat)
+    payload: menuApi.getMenu(menu, cat)
 })
 
-export const addQuantity = (shoppingCart, menu, total) => ({
-    type: ACTIONS.ADD_QTY,
-    payload: menuApi.addQuantity(shoppingCart, menu, total)
+export const adjQuantity = (quantity, menu, isAdd) => ({
+    type: ACTIONS.ADJ_QTY,
+    payload: menuApi.adjustQuantity(quantity, menu, isAdd)
 })
 
-export const subQuantity = (shoppingCart, menu, total) => ({
-    type: ACTIONS.SUB_QTY,
-    payload: menuApi.subQuantity(shoppingCart, menu, total)
+export const putOrder = (quantity, shoppingCart, menuCode) => ({
+    type: ACTIONS.PUT_ORDER,
+    payload: menuApi.putOrder(quantity, shoppingCart, menuCode)
 })

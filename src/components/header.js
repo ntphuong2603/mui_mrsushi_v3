@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
 import { AppBar, Badge, Button, ClickAwayListener,  IconButton, makeStyles, Popover, Toolbar, Typography } from '@material-ui/core'
 import MenuIcon from '@material-ui/icons/Menu'
-import { MENU_BAR, MENU_ICON } from '../constants/menu-bar';
+import { MENU_BAR } from '../constants/menu-bar';
 import { LinkContainer } from 'react-router-bootstrap'
 import { ShoppingCart } from '@material-ui/icons';
 import { useSelector } from 'react-redux';
+import { ICON, MENU_ICON } from '../constants/icons';
 
 
 const styles = makeStyles((theme)=>({
@@ -45,7 +46,7 @@ const Header = () => {
     const [selectedMenu, setSelectedMenu] = useState(MENU_BAR[0])
     const [anchorEle, setAnchorEle] = useState(null)
     const [menuID, setMenuID] = useState(null)
-    const { total } = useSelector(state=>state.menu)
+    const { shoppingCart } = useSelector(state=>state.menu)
     
     const handleMenuMobile = (event = null) => {
         if (event === null){
@@ -80,7 +81,10 @@ const Header = () => {
             {MENU_BAR.map((menu)=>(
                 <LinkContainer to={`/${menu}`} key={menu}>
                     <Button {...getActiveButton(menu)} onClick={()=>setSelectedMenu(menu)}>
-                        {menu}
+                        {menu==='cart' ?
+                        <Badge badgeContent={shoppingCart ? shoppingCart.total : 0} showZero color='primary' >
+                            {menu} {ICON.SHOPPING_CART}
+                        </Badge>: menu}
                     </Button>
                 </LinkContainer>
             ))}
@@ -90,11 +94,13 @@ const Header = () => {
     const menu_mobile = () => (
         <ClickAwayListener onClickAway={()=>handleMenuMobile()}>
             <div className={classes.sectionMobile}>
-                <IconButton color='inherit' aria-describedby={menuID} onClick={event=>handleMenuMobile(event)}>
-                    <Badge badgeContent={total ? total : 0} showZero color='secondary' >
-                        <ShoppingCart/>
-                    </Badge>
-                </IconButton>
+                <LinkContainer to='/cart'>
+                    <IconButton color='inherit'>
+                        <Badge badgeContent={shoppingCart ? shoppingCart.total : 0} showZero color='secondary' >
+                            {ICON.SHOPPING_CART}
+                        </Badge>
+                    </IconButton>
+                </LinkContainer>
                 <IconButton color='inherit' aria-describedby={menuID} onClick={event=>handleMenuMobile(event)}>
                     <MenuIcon/>
                 </IconButton>

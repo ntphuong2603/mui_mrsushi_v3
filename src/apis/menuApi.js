@@ -15,18 +15,26 @@ export const getCategory = async () => {
     }
 }
 
-export const getMenu = async (cat=null) => {
+export const getMenu = async (menus=[], cat=null) => {
     try{
         if (cat===null){
             return {
                 menus: []
             }
         }
-        const res = await axios.get(`${URL}/menus?cat=${cat}`)
 
-        if (res.data) {
+        const menuExist = menus.filter(menu=>menu.cat===cat)
+        if (menuExist.length){
             return {
-                menus: res.data
+                menus: menus
+            }
+        } else {
+            const res = await axios.get(`${URL}/menus?cat=${cat}`)
+
+            if (res.data) {
+                return {
+                    menus: [...menus, ...res.data]
+                }
             }
         }
     } catch (error){
@@ -34,21 +42,35 @@ export const getMenu = async (cat=null) => {
     }
 }
 
-export const addQuantity = (quantity=[], menu, total = 0) => {
-    const quantityMenu = quantity.filter(selectedMenu=>selectedMenu.code===menu.code)
-    if (quantityMenu.length === 0){
-        quantityMenu.push({ ...menu, qty: 0})
+export const adjustQuantity = (quantity=[], menu, isAdd) => {
+
+    if (quantity.length === 0 || quantity.filter(selectedMenu=>selectedMenu.code===menu.code).length===0){
+        quantity.push({ ...menu, qty: 0})
     }
-    return {
-        quantity: [...quantity.filter(selectedMenu=>selectedMenu.code!==menu.code), { ...menu, qty: quantityMenu[0].qty + 1}],
-        total: total + 1,
-    }
+
+    const quantityMenu = quantity.filter(selectedMenu=>selectedMenu.code===menu.code)[0]
+    quantityMenu.qty += isAdd ? 1 : -1
+    return { quantity }
 }
 
-export const subQuantity = (quantity=[], menu, total) => {
-    const quantityMenu = quantity.filter(selectedMenu=>selectedMenu.code===menu.code)
+export const putOrder = (quantity, shoppingCart, menuCode) => {
+    const orderCart = quantity.filter(menu=>menu.code===menuCode)[0]
+    const orders = {}
+    if (shoppingCart===undefined){
+        orders.order = [{...orderCart}]
+        orders.total = orderCart.qty
+    } else {
+        const existOrder = shoppingCart.order.filter(order=>order.code===menuCode)
+        if (existOrder.length) {
+            orders.order = [...shoppingCart.order.filter(order=>order.code!==menuCode),{...orderCart, qty: existOrder.qty + orderCart.qty}]
+            orders.total = shoppingCart.total + orderCart.qty
+        } else {
+            orders.order = [...shoppingCart.order, {...orderCart, qty: orderCart.qty}]
+            orders.total = shoppingCart.total + orderCart.qty
+        }
+    }
     return {
-        quantity: [...quantity.filter(selectedMenu=>selectedMenu.code!==menu.code), { ...menu, qty: quantityMenu[0].qty - 1}],
-        total: total - 1,
+        shoppingCart: { ...orders},
+        quantity : quantity.filter(menu=>menu.code !== menuCode)
     }
 }

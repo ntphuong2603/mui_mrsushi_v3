@@ -1,11 +1,7 @@
-import { Button, ButtonBase, ButtonGroup, Container, FormControl, Grid, IconButton, InputLabel, makeStyles, MenuItem, Paper, Select, Typography } from '@material-ui/core';
-// import { ExpandMore } from '@material-ui/icons';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
-import ExpandLessIcon from '@material-ui/icons/ExpandLess'
-import AddShoppingCartIcon from '@material-ui/icons/AddShoppingCart';
+import { Button, ButtonBase, ButtonGroup, FormControl, Grid, IconButton, InputLabel, makeStyles, MenuItem, Select, Typography } from '@material-ui/core';
 import React, { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { ARROW } from '../constants/menu-bar';
+import { ARROW, ICON } from '../constants/icons';
 import * as menuActions from '../store/actions/menuAction'
 import { getFirtLetterCapital } from '../tools/strTools';
 
@@ -16,30 +12,39 @@ const styles = makeStyles(theme=>({
     },
     paper:{
         margin: theme.spacing(1,1),
+    },
+    btn:{
+        minWidth: '20%',
+        maxWidth: '30%',
+        margin: theme.spacing(1,0),
+        padding: theme.spacing(0),
+    },
+    btnAdd:{
+        padding: theme.spacing(1),
+        marginRight: theme.spacing(1),
     }
 }))
 
 const Menu = () => {
     const classes = styles()
-    const { categories, menus, quantity, shoppingCart, total } = useSelector(state=>state.menu)
+    const { categories, menus, quantity, shoppingCart } = useSelector(state=>state.menu)
     const dispatch = useDispatch()
     const [selectedCategory, setSelectedCategory] = useState(null)
 
     useEffect(()=>{
-        dispatch(menuActions.getCategory())
+        if (!categories) dispatch(menuActions.getCategory())
     },[])
 
     useEffect(()=>{
-        dispatch(menuActions.getMenu(selectedCategory))
+        if (selectedCategory !== null) dispatch(menuActions.getMenu(menus, selectedCategory))
     },[selectedCategory])
 
-    const handleQuantity = (menu, act) => {
-        if (act==='add') dispatch(menuActions.addQuantity(quantity, menu))
-        if (act==='sub') dispatch(menuActions.subQuantity(quantity, menu))
+    const handleQuantity = (menu, isAdd) => {
+        dispatch(menuActions.adjQuantity(quantity, menu, isAdd))
     }
     
     const handleShoppingCart = (menuCode) => {
-
+        dispatch(menuActions.putOrder(quantity, shoppingCart, menuCode))
     }
 
     const getQuantity = (menuCode) => {
@@ -71,6 +76,7 @@ const Menu = () => {
             <InputLabel>Select category</InputLabel>
             <Select
                 value={selectedCategory}
+                // onChange={(event)=>handelCategory(event)}
                 onChange={(event)=>setSelectedCategory(event.target.value)}
                 label='Select category'
                 MenuProps={menuProps}>
@@ -82,7 +88,7 @@ const Menu = () => {
     )
     
     const menuList = () => (
-        menus.map((menu,index)=>(
+        menus.filter(menu=>menu.cat===selectedCategory).map((menu,index)=>(
             <Grid container spacing={2}>
                 <Grid item xs={5}> 
                     <ButtonBase>
@@ -96,11 +102,17 @@ const Menu = () => {
                     <Grid item>
                         <Typography variant='h5' align='right'>$ {menu.price.toFixed(2)}</Typography>
                     </Grid>
-                    <Grid item >
-                        <IconButton variant='contained' color='secondary'><AddShoppingCartIcon/></IconButton>
-                        <IconButton color='primary' onClick={()=>handleQuantity(menu,'add')}>{ARROW.UP}</IconButton>
-                        <IconButton disabled >{getQuantity(menu.code)}</IconButton>
-                        <IconButton color='primary' disabled={!getQuantity(menu.code)} onClick={()=>handleQuantity(menu,'sub')}>{ARROW.DOWN}</IconButton>
+                    <Grid item justify='space-between'>
+                        <Button size='large' className={classes.btnAdd} variant='contained' color='secondary' disabled={!getQuantity(menu.code)} onClick={()=>handleShoppingCart(menu.code)}>{ICON.ADD_SHOPPING_CART}</Button>
+                        <Button className={classes.btn} variant='outlined' color='secondary'
+                            onClick={()=>handleQuantity(menu,true)}>
+                                {ARROW.UP}
+                        </Button>
+                        <Button size='medium' className={classes.btn} variant='text'>{getQuantity(menu.code)}</Button>
+                        <Button className={classes.btn} variant='outlined' color='primary' 
+                            disabled={!getQuantity(menu.code)} onClick={()=>handleQuantity(menu,false)}>
+                            {ARROW.DOWN}
+                        </Button>
                     </Grid>
                 </Grid>
             </Grid>

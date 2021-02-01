@@ -10,6 +10,8 @@ export default function menuReducer(state={}, action){
             return {...state, ...action.payload}
         case ACTIONS.SUB_QTY:
             return {...state, ...action.payload}
+        case ACTIONS.PUT_ORDER:
+            return {...state, ...action.payload}
         default:
             return {...state, ...action.payload}
     }
