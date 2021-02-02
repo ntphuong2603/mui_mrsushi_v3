@@ -13,3 +13,4 @@ export const ICON = {
 }
 
 export const MENU_ICON = [<MUI_ICONS.Home/>,<MUI_ICONS.Info/>,<MUI_ICONS.RestaurantMenu/>,<MUI_ICONS.ShoppingCart/>,<MUI_ICONS.Lock/>]
+export const MENU_ICON_SHORTCUT = [<MUI_ICONS.RestaurantSharp/>,<MUI_ICONS.ShoppingCartSharp/>]

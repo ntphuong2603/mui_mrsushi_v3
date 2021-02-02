@@ -11,7 +11,7 @@ export const cancelOrder = () => ({
     payload: cartApi.cancelOrder()
 })
 
-export const placeOrder = (orders) => ({
+export const placeOrder = (orders, customerInfo) => ({
     type: ACTIONS.PLACE_ORDER,
-    payload: cartApi.placeOrder(orders)
+    payload: cartApi.placeOrder(orders, customerInfo)
 })

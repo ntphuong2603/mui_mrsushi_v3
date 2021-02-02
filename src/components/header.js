@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
 import { AppBar, Badge, Button, ClickAwayListener,  IconButton, makeStyles, Popover, Toolbar, Typography } from '@material-ui/core'
 import MenuIcon from '@material-ui/icons/Menu'
-import { MENU_BAR } from '../constants/menu-bar';
+import { MENU_BAR, MENU_SHORTCUT } from '../constants/menu-bar';
 import { LinkContainer } from 'react-router-bootstrap'
 import { ShoppingCart } from '@material-ui/icons';
 import { useSelector } from 'react-redux';
-import { ICON, MENU_ICON } from '../constants/icons';
+import { ICON, MENU_ICON, MENU_ICON_SHORTCUT } from '../constants/icons';
 
 
 const styles = makeStyles((theme)=>({
@@ -94,13 +94,17 @@ const Header = () => {
     const menu_mobile = () => (
         <ClickAwayListener onClickAway={()=>handleMenuMobile()}>
             <div className={classes.sectionMobile}>
-                <LinkContainer to='/cart'>
-                    <IconButton color='inherit'>
-                        <Badge badgeContent={shoppingCart ? shoppingCart.total : 0} showZero color='secondary' >
-                            {ICON.SHOPPING_CART}
-                        </Badge>
-                    </IconButton>
-                </LinkContainer>
+                {MENU_SHORTCUT.map((menu,index)=>(
+                    <LinkContainer to={`/${menu}`}>
+                        <IconButton color='inherit'>
+                            {menu==='cart' ? 
+                                <Badge badgeContent={shoppingCart ? shoppingCart.total : 0} showZero color='secondary' >
+                                    {MENU_ICON_SHORTCUT[index]}
+                                </Badge>
+                            : MENU_ICON_SHORTCUT[index]}
+                        </IconButton>
+                    </LinkContainer>    
+                ))}
                 <IconButton color='inherit' aria-describedby={menuID} onClick={event=>handleMenuMobile(event)}>
                     <MenuIcon/>
                 </IconButton>

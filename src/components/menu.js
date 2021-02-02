@@ -36,8 +36,11 @@ const Menu = () => {
     },[])
 
     useEffect(()=>{
-        if (selectedCategory !== null) dispatch(menuActions.getMenu(menus, selectedCategory))
-    },[selectedCategory])
+        if (selectedCategory) {
+            dispatch(menuActions.getMenu(menus, selectedCategory))
+            if (menus) dispatch(menuActions.initQuantity(quantity,menus))
+        }
+    },[selectedCategory, menus])
 
     const handleQuantity = (menu, isAdd) => {
         dispatch(menuActions.adjQuantity(quantity, menu, isAdd))

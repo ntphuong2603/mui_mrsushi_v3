@@ -18,14 +18,21 @@ export const cancelOrder = () => {
     }
 }
 
-export const placeOrder = async (orders) => {
-    // console.log('Orders: ',orders);
-    const order = {orders: orders}
+export const placeOrder = async (orders, customerInfo) => {
+
     try {
-        const res = await axios.post(`${URL}/orders`,order)
-        if (res.data){
-            return {
-                orders: res.data
+        const res_customer = await axios.post(`${URL}/customers`, customerInfo)
+        if (res_customer.data){
+            const order = {
+                orders: orders.map(order=>({code:order.code, qty: order.qty})),
+                date: Date.now(),
+                customerID: res_customer.data.id,
+            }
+            const res = await axios.post(`${URL}/orders`,order)
+            if (res.data){
+                return {
+                    orders: res.data
+                }
             }
         }
     } catch (error){

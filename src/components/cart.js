@@ -1,5 +1,5 @@
-import { Button, ButtonBase, ButtonGroup, Grid, makeStyles, Typography } from '@material-ui/core'
-import React from 'react'
+import { Button, ButtonBase, ButtonGroup, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, makeStyles, TextField, Typography } from '@material-ui/core'
+import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { ARROW } from '../constants/icons'
 import * as cartActions from '../store/actions/cartAction'
@@ -21,6 +21,7 @@ const Cart = () => {
     const classes = styles()
     const { shoppingCart } = useSelector(state=>state.menu)
     const dispatch = useDispatch()
+    const [openDialog, setOpenDialog] = useState(false)
 
     const adjustQuantityOrder = (menuCode,isAdd) => {
         dispatch(cartActions.adjustQuantityOrder(shoppingCart, menuCode,isAdd))
@@ -32,6 +33,17 @@ const Cart = () => {
 
     const placeOrder = () => {
         dispatch(cartActions.placeOrder(shoppingCart.order))
+        dispatch(cartActions.cancelOrder())
+    }
+
+    const handlePlaceOrder = () => {
+        const customerInfo = {
+            name: 'test#1',
+            phone:'1234567890',
+            address: 'test address',
+        }
+        setOpenDialog(!openDialog)
+        dispatch(cartActions.placeOrder(shoppingCart.order, customerInfo))
         dispatch(cartActions.cancelOrder())
     }
 
@@ -67,13 +79,53 @@ const Cart = () => {
             </Grid>
         ))
     )
+
+    const customerInfo = () => (
+        <>
+            <Dialog open={openDialog} onClose={()=>setOpenDialog(!openDialog)} aria-labelledly='customer-info-dialog'>
+                <DialogTitle id='customer-info-dialog'>Customer info</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        To be completely finish your order, please full fill your info
+                        <TextField
+                            autoFocus
+                            margin='dense'
+                            id='cus_name'
+                            label='Your name'
+                            type='text'
+                            fullWidth/>
+                        <TextField
+                            autoFocus
+                            margin='dense'
+                            id='cus_phone'
+                            label='Phone numer'
+                            type='text'
+                            fullWidth/>
+                        <TextField
+                            autoFocus
+                            margin='dense'
+                            id='cus_address'
+                            label='Address'
+                            type='text'
+                            fullWidth/>
+                    </DialogContentText>
+                    <DialogActions>
+                        <Button variant='outlined' onClick={()=>setOpenDialog(!openDialog)} color='secondary'>Cancel</Button>
+                        <Button variant='contained' onClick={()=>handlePlaceOrder()} color='primary'>Submit</Button>
+                    </DialogActions>
+                </DialogContent>
+            </Dialog>
+        </>
+    )
+
     return(
         <>
             {shoppingCart && orderList() }
             <ButtonGroup size='large' fullWidth disabled={!shoppingCart || shoppingCart.total===0}>
                 <Button variant='contained' color='secondary' onClick={()=>{cancelOrder()}}>Cancel</Button>
-                <Button variant='contained' color='primary' onClick={()=>{placeOrder()}}>Place order</Button>
+                <Button variant='contained' color='primary' onClick={()=>{setOpenDialog(!openDialog)}}>Place order</Button>
             </ButtonGroup>
+            {customerInfo()}
         </>
     )
 }

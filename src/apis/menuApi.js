@@ -42,12 +42,18 @@ export const getMenu = async (menus=[], cat=null) => {
     }
 }
 
-export const adjustQuantity = (quantity=[], menu, isAdd) => {
+export const initQuantity = (quantity=[], menus) =>{
+    const init_quantity = quantity ? [] : quantity
+    menus.forEach(menu=>{
+        if (init_quantity.length === 0 || init_quantity.filter(selectedMenu=>selectedMenu.code===menu.code).length===0){
+            init_quantity.push({ ...menu, qty: 1})
+        }
+    })
 
-    if (quantity.length === 0 || quantity.filter(selectedMenu=>selectedMenu.code===menu.code).length===0){
-        quantity.push({ ...menu, qty: 0})
-    }
+    return { quantity: init_quantity }
+}
 
+export const adjustQuantity = (quantity, menu, isAdd) => {
     const quantityMenu = quantity.filter(selectedMenu=>selectedMenu.code===menu.code)[0]
     quantityMenu.qty += isAdd ? 1 : -1
     return { quantity }

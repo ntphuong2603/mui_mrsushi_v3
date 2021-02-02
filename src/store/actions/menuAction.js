@@ -11,6 +11,11 @@ export const getMenu = (menu, cat) => ({
     payload: menuApi.getMenu(menu, cat)
 })
 
+export const initQuantity = (quantity, menus) => ({
+    type: ACTIONS.INIT_QTY,
+    payload: menuApi.initQuantity(quantity, menus)
+})
+
 export const adjQuantity = (quantity, menu, isAdd) => ({
     type: ACTIONS.ADJ_QTY,
     payload: menuApi.adjustQuantity(quantity, menu, isAdd)
